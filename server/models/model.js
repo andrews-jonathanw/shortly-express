@@ -13,6 +13,8 @@ const parseData = options => {
   }, { string: [], values: [] });
 };
 
+// _.reduce(array, callback, initial)
+
 /**
  * Base class for all database models, written in ES6 class format. You should NOT refer
  * to this interface directly unless you are creating a new model subclass.

@@ -39,8 +39,8 @@ describe('', function() {
     /* TODO: Update user and password if different than on your local machine            */
     /*************************************************************************************/
     db = mysql.createConnection({
-      user: 'student',
-      password: 'student',
+      user: 'root',
+      password: '',
       database: 'shortly'
     });
 
@@ -123,7 +123,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Account Creation:', function() {
+  describe('Account Creation:', function() {
 
     it('signup creates a new user record', function(done) {
       var options = {
@@ -208,7 +208,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Account Login:', function() {
+  describe('Account Login:', function() {
 
     beforeEach(function(done) {
       var options = {
@@ -277,7 +277,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Sessions Schema:', function() {
+  describe('Sessions Schema:', function() {
     it('contains a sessions table', function(done) {
       var queryString = 'SELECT * FROM sessions';
       db.query(queryString, function(err, results) {
@@ -325,7 +325,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Express Middleware', function() {
+  describe('Express Middleware', function() {
     var cookieParser = require('../server/middleware/cookieParser.js');
     var createSession = require('../server/middleware/auth.js').createSession;
 
@@ -348,18 +348,21 @@ describe('', function() {
 
         cookieParser(requestWithoutCookies, response, function() {
           var cookies = requestWithoutCookies.cookies;
+          console.log('test cookies', cookies);
           expect(cookies).to.be.an('object');
           expect(cookies).to.eql({});
         });
 
         cookieParser(requestWithCookies, response, function() {
           var cookies = requestWithCookies.cookies;
+          console.log('test cookies', cookies);
           expect(cookies).to.be.an('object');
           expect(cookies).to.eql({ shortlyid: '8a864482005bcc8b968f2b18f8f7ea490e577b20' });
         });
 
         cookieParser(requestWithMultipleCookies, response, function() {
           var cookies = requestWithMultipleCookies.cookies;
+          console.log('test cookies', cookies);
           expect(cookies).to.be.an('object');
           expect(cookies).to.eql({
             shortlyid: '18ea4fb6ab3178092ce936c591ddbb90c99c9f66',

@@ -16,66 +16,130 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 
 
-app.get('/', 
-(req, res) => {
-  res.render('index');
-});
+app.get('/',
+  (req, res) => {
+    res.render('index');
+  });
 
-app.get('/create', 
-(req, res) => {
-  res.render('index');
-});
+app.get('/create',
+  (req, res) => {
+    res.render('index');
+  });
 
-app.get('/links', 
-(req, res, next) => {
-  models.Links.getAll()
-    .then(links => {
-      res.status(200).send(links);
-    })
-    .error(error => {
-      res.status(500).send(error);
-    });
-});
-
-app.post('/links', 
-(req, res, next) => {
-  var url = req.body.url;
-  if (!models.Links.isValidUrl(url)) {
-    // send back a 404 if link is not valid
-    return res.sendStatus(404);
-  }
-
-  return models.Links.get({ url })
-    .then(link => {
-      if (link) {
-        throw link;
-      }
-      return models.Links.getUrlTitle(url);
-    })
-    .then(title => {
-      return models.Links.create({
-        url: url,
-        title: title,
-        baseUrl: req.headers.origin
+app.get('/links',
+  (req, res, next) => {
+    models.Links.getAll()
+      .then(links => {
+        res.status(200).send(links);
+      })
+      .error(error => {
+        res.status(500).send(error);
       });
-    })
-    .then(results => {
-      return models.Links.get({ id: results.insertId });
-    })
-    .then(link => {
-      throw link;
-    })
-    .error(error => {
-      res.status(500).send(error);
-    })
-    .catch(link => {
-      res.status(200).send(link);
-    });
-});
+  });
+
+app.post('/links',
+  (req, res, next) => {
+    var url = req.body.url;
+    if (!models.Links.isValidUrl(url)) {
+      // send back a 404 if link is not valid
+      return res.sendStatus(404);
+    }
+
+    return models.Links.get({ url })
+      .then(link => {
+        if (link) {
+          throw link;
+        }
+        return models.Links.getUrlTitle(url);
+      })
+      .then(title => {
+        return models.Links.create({
+          url: url,
+          title: title,
+          baseUrl: req.headers.origin
+        });
+      })
+      .then(results => {
+        return models.Links.get({ id: results.insertId });
+      })
+      .then(link => {
+        throw link;
+      })
+      .error(error => {
+        res.status(500).send(error);
+      })
+      .catch(link => {
+        res.status(200).send(link);
+      });
+  });
 
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
+// open the signup page
+app.get('/signup', (req, res) => {
+  res.render('signup');
+});
+
+//app.post
+app.post('/signup', (req, res) => {
+  // req body { username: 'Samantha', password: 'Samantha' }
+  // console.log('req body', req.body);
+  models.Users.create(req.body)
+    .then((success) => {
+      res.location('/');
+      res.render('index');
+    })
+    .catch((error) => {
+      res.location('/signup'); // .../signup
+      res.render('signup'); // render signup page
+    });
+});
+
+// res.location:
+
+// res.location(url): This method is used to set the HTTP response header "Location" to the specified URL. It is typically used to indicate a redirection URL to the client.
+
+// res.render:
+
+// res.render(view [, locals] [, callback]): This method is used to render an HTML view and send it as the response to the client. It is typically used to generate HTML pages dynamically using a view template engine (such as EJS, Pug, Handlebars, etc.).
+
+
+//----------------------LOGIN---------------------------//
+app.post('/login', (req, res) => {
+  // login req body { username: 'Samantha', password: 'Samantha' }
+  // console.log('login req body', req.body);
+  var options = {};
+  options['username'] = req.body.username;
+
+  // var password = req.body.password;
+  // var salt = utils.createHash(password);
+  // console.log('salt', salt);
+  models.Users.get(options)
+    .then((success) => {
+      var attempted = req.body.password;
+      console.log('success', success);
+      var password = success.password;
+      var salt = success.salt;
+
+      // console.log(password);
+      if (models.Users.compare(attempted, password, salt)) {
+        // enter the right password
+        res.location('/');
+        res.render('index');
+      } else {
+        res.location('/login');
+        res.render('login');
+      }
+    })
+    .catch((error) => {
+      res.location('/login');
+      res.render('login');
+
+    });
+
+});
+
 
 
 
