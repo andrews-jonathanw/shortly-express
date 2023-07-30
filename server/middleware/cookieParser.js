@@ -13,7 +13,6 @@ const parseCookies = (req, res, next) => {
 
   if (cookies === undefined) {
     req.cookies = {};
-
   } else {
     var cookiesObj = {};
     // split into array , iterate through the array
@@ -22,13 +21,12 @@ const parseCookies = (req, res, next) => {
       var value = cookie.split('=')[1];
       cookiesObj[key] = value;
     });
-    console.log('our cookieObj', cookiesObj);
+    //console.log('our cookieObj', cookiesObj);
     req.cookies = cookiesObj;
   }
   // req.cookies = cookiesObj;
   // console.log('parseCookies request cookies after parse', req.cookies);
   next();
-
 };
 
 module.exports = parseCookies;
